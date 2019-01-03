@@ -27,13 +27,19 @@ Data Stack size         : 256
 
 // Alphanumeric LCD functions
 #include <alcd.h>
+#define Tstep 1000
 
+int Tcount = 0;
 // Timer 0 overflow interrupt service routine
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)
 {
 // Reinitialize Timer 0 value
 TCNT0=0x06;
 // Place your code here
+Tcount+=Tcount;
+if (Tcount == Tstep) {
+Tcount = 0;                // обнуление для 1 секунды шага
+};
 
 }
 
@@ -69,6 +75,8 @@ return adc_data;
 }
 
 // Declare your global variables here
+char Fled = 0; // флаг для свтда
+char Foldled = 0; // флаг для свтда
 
 void main(void)
 {
@@ -78,8 +86,10 @@ void main(void)
 // Port B initialization
 // Func7=In Func6=In Func5=In Func4=In Func3=In Func2=In Func1=Out Func0=Out 
 // State7=T State6=T State5=T State4=T State3=T State2=P State1=0 State0=0 
+// Func7=In Func6=In Func5=Out Func4=In Func3=In Func2=In Func1=Out Func0=Out
+// State7=T State6=T State5=0 State4=T State3=T State2=P State1=0 State0=0 
 PORTB=0x04;
-DDRB=0x03;
+DDRB=0x43;//DDRB=0x03;
 
 // Port C initialization
 // Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In 
@@ -185,6 +195,7 @@ lcd_init(16);
 while (1)
       {
       // Place your code here
+      
 
       }
 }
