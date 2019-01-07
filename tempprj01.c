@@ -28,7 +28,7 @@ Data Stack size         : 256
 // Alphanumeric LCD functions
 #include <alcd.h>
 #define Tstep 1000          //по достжению  (int Tcountint Tcount=Tstep) * время прерыв [TIM0_OVF] = время 1 сек
-#define Testled PORTB.5  
+#define Testled PORTB.5     // тестовый св-диод на плате arduino
 
 int Tcount = 0;
 
