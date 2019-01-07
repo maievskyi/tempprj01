@@ -27,18 +27,21 @@ Data Stack size         : 256
 
 // Alphanumeric LCD functions
 #include <alcd.h>
-#define Tstep 1000
+#define Tstep 1000          //по достжению  (int Tcountint Tcount=Tstep) * врем€ прерыв [TIM0_OVF] = врем€ 1 сек
+#define Testled PORTB.5  
 
 int Tcount = 0;
+
 // Timer 0 overflow interrupt service routine
-interrupt [TIM0_OVF] void timer0_ovf_isr(void)
+interrupt [TIM0_OVF] void timer0_ovf_isr(void)  //прерывание по переполнению на 1 мс
 {
 // Reinitialize Timer 0 value
 TCNT0=0x06;
 // Place your code here
-Tcount+=Tcount;
+Tcount+=1;
 if (Tcount == Tstep) {
 Tcount = 0;                // обнуление дл€ 1 секунды шага
+ Testled^=1;               //инвертировать светодиод
 };
 
 }
@@ -89,7 +92,7 @@ void main(void)
 // Func7=In Func6=In Func5=Out Func4=In Func3=In Func2=In Func1=Out Func0=Out
 // State7=T State6=T State5=0 State4=T State3=T State2=P State1=0 State0=0 
 PORTB=0x04;
-DDRB=0x43;//DDRB=0x03;
+DDRB=0x23;//DDRB=0x03;
 
 // Port C initialization
 // Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In 
@@ -187,7 +190,7 @@ TWCR=0x00;
 // D6 - PORTD Bit 6
 // D7 - PORTD Bit 7
 // Characters/line: 16
-lcd_init(16);
+//lcd_init(16);      //врем откл т к переключало самосто€тельно порты (¬5)?
 
 // Global enable interrupts
 #asm("sei")
@@ -195,6 +198,7 @@ lcd_init(16);
 while (1)
       {
       // Place your code here
+
       
 
       }
