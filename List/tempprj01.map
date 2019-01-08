@@ -1,7 +1,6 @@
 RAM Allocation
 Variable                                                          Address   Size
 --------------------------------------------------------------------------------
-_base_y                                                           0x0160       4
 
 EEPROM Allocation
 Variable                                                          Address   Size
@@ -14,6 +13,3 @@ Tcount                                                            R4,R5        2
 adc_data                                                          R7           1
 Fled                                                              R6           1
 Foldled                                                           R9           1
-_lcd_x                                                            R8           1
-_lcd_y                                                            R11          1
-_lcd_maxx                                                         R10          1

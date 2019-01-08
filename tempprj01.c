@@ -1,4 +1,7 @@
 /*****************************************************
+Можно использовать для тестирования Arduino на мигание
+светодиодом и тактирование 16 мгц
+  
 This program was produced by the
 CodeWizardAVR V2.05.3 Standard
 Automatic Program Generator
@@ -26,16 +29,22 @@ Data Stack size         : 256
 #include <delay.h>
 
 // Alphanumeric LCD functions
-#include <alcd.h>
+//#include <alcd.h>   // для LCD от CWision
 #define Tstep 1000          //по достжению  (int Tcountint Tcount=Tstep) * время прерыв [TIM0_OVF] = время 1 сек
 #define Testled PORTB.5     // тестовый св-диод на плате arduino
 
+#define RS  PORTB.0
+#define E   PORTB.1
+#define D4  PORTD.4
+#define D5  PORTD.5
+#define D6  PORTD.6
+#define D7  PORTD.7 //9877654321
 int Tcount = 0;
 
 // Timer 0 overflow interrupt service routine
 interrupt [TIM0_OVF] void timer0_ovf_isr(void)  //прерывание по переполнению на 1 мс
 {
-// Reinitialize Timer 0 value
+//----------- Reinitialize Timer 0x06 value for the interrapt 1 ms
 TCNT0=0x06;
 // Place your code here
 Tcount+=1;
@@ -43,7 +52,7 @@ if (Tcount == Tstep) {
 Tcount = 0;                // обнуление для 1 секунды шага
  Testled^=1;               //инвертировать светодиод
 };
-
+//-----------------------------------------------------------------
 }
 
 unsigned char adc_data;
@@ -76,6 +85,10 @@ delay_us(10);
 #endasm
 return adc_data;
 }
+void send_LCD(char RS_value,char DB4_value,char DB5_value,char DB6_value,char DB7_value) {
+int t;
+}
+
 
 // Declare your global variables here
 char Fled = 0; // флаг для свтда
@@ -198,6 +211,11 @@ TWCR=0x00;
 while (1)
       {
       // Place your code here
+      #asm("cli")		// запретим прерывания
+		delay_us(150); 	// сгенерируем задержку 150 мкс
+		//...
+		delay_ms(15); 	// сгенерируем задержку 15 мс
+		#asm("sei")		// разрешим прерывания
 
       
 
