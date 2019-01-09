@@ -1,19 +1,19 @@
 /*****************************************************
 Можно использовать для тестирования Arduino на мигание
 светодиодом и тактирование 16 мгц
-  
+
 This program was produced by the
 CodeWizardAVR V2.05.3 Standard
 Automatic Program Generator
 © Copyright 1998-2011 Pavel Haiduc, HP InfoTech s.r.l.
 http://www.hpinfotech.com
 
-Project : 
-Version : 
+Project :
+Version :
 Date    : 02.01.2019
 Author  : PerTic@n
 Company : If You Like This Software,Buy It
-Comments: 
+Comments:
 
 
 Chip type               : ATmega8
@@ -32,6 +32,10 @@ Data Stack size         : 256
 //#include <alcd.h>   // для LCD от CWision
 #define Tstep 1000          //по достжению  (int Tcountint Tcount=Tstep) * время прерыв [TIM0_OVF] = время 1 сек
 #define Testled PORTB.5     // тестовый св-диод на плате arduino
+
+#define mks_after_com 4  //для обработки команд 4 ms Хотя даташ, требует задержку не менее 40мкс
+#define mks_strobe    5   //задержку для стробирующего импульса, подбирается опытным путем,
+						// 5 мкс было достаточной длительностью для данного LCD.
 
 #define RS  PORTB.0
 #define E   PORTB.1
@@ -85,14 +89,72 @@ delay_us(10);
 #endasm
 return adc_data;
 }
-void send_LCD(char RS_value,char DB4_value,char DB5_value,char DB6_value,char DB7_value) {
-int t;
+//void send_LCD(char RS_value,char DB4_value,char DB5_value,char DB6_value,char DB7_value) {
+//int t;
+//}
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+void lcd_dat(unsigned char x){     //111111111111>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+RS=1;  // ввод данные
+E=1;  //есть стробимпульс
+PORTD |=0x0F;       //обнул СТАРШ лин PORTD
+PORTD |=(x & 0xF0); // запись ст пб в порт, младш лин PORTD не меняется
+delay_us(40); 	    //   время 1-строб
+E=0;  //нет стробимпульса (запись)
+delay_us(40); 	    //   задежка после записи
+E=1;  //есть стробимпульс
+PORTD |=0x0F;       //опять обнул СТАРШ лин PORTD
+PORTD |=(x << 4); // запись мл пб в старш лин порт, младш лин PORTD не меняется
+delay_us(40); 	    //   время 1-строб
+E=0;  //нет стробимпульса (запись)
+delay_us(40); 	    //   задежка после записи
 }
-
-
+void lcd_com(unsigned char x){  //2222222222222222222>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+RS=0;  // ввод команды
+E=1;  //есть стробимпульс
+PORTD |=0x0F;       //обнул СТАРШ лин PORTD
+PORTD |=(x & 0xF0); // запись ст пб в порт, младш лин PORTD не меняется
+delay_us(40); 	    //   время 1-строб
+E=0;  //нет стробимпульса (запись)
+delay_us(40); 	    //   задежка после записи
+E=1;  //есть стробимпульс
+PORTD |=0x0F;       //опять обнул СТАРШ лин PORTD
+PORTD |=(x << 4); // запись мл пб в старш лин порт, младш лин PORTD не меняется
+delay_us(40); 	    //   время 1-строб
+E=0;  //нет стробимпульса (запись)
+delay_us(40); 	    //   задежка после записи
+}
+void lcd_init(void){ //3333333333333333333333333333>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ /*Если кратко, то инициализация это последовательность команд
+Команда №6 — 0x30 – установить режим 8 бит
+Команда №6 — 0x28 – установить режим 4 бита
+Команда №4 — 0x08 – выключить дисплей
+Команда №1 — 0x01–  сброс дисплея
+Команда №3 — 0x06–  при записи, курсор сдвигать вправо
+Команда №4 — 0x0C – включить дисплей
+*/
+delay_ms(20); 	// сгенерируем задержку 20 мс
+ // ----- команда №6 (установка разрядности) посылаем 0x30 на D4-D7 -----
+ // send_LCD(0,1,1,0,0);              // RS=0, DB4=1, DB5=1, DB6=0, DB7=0
+lcd_com(0x30);    // 8-bit reshim
+//...............
+RS=0;                                                           // ввод команды
+E=1;                                                            //есть стробимпульс
+PORTD |=0x0F;                                                   //обнул СТАРШ лин PORTD
+PORTD |=(0x20 & 0xF0);                 // запись ст пб в порт, младш лин PORTD не меняется
+delay_us(40); 	                                                //   время 1-строб
+E=0;                                //нет стробимпульса (запись)
+delay_us(40); 	                                                // задежка после записи
+//......................................так как произошло перекл на 4 bit, то повтор ->
+lcd_com(0x28);    // 4-bit reshim
+lcd_com(0x08);    // полное выключение дисплея, курс не видн, не мигает
+lcd_com(0x01);    // очистка дисплея
+lcd_com(0x06);    // реж сдвига курсора вправо, без сдв экр-на
+lcd_com(0x0C);    // включение дисплея, курс не видн, не мигает
+}    // end LCD_INIT
+//...............................................................................
 // Declare your global variables here
-char Fled = 0; // флаг для свтда
-char Foldled = 0; // флаг для свтда
+//char Fled = 0; // флаг для свтда
+//char Foldled = 0; // флаг для свтда
 
 void main(void)
 {
@@ -100,22 +162,22 @@ void main(void)
 
 // Input/Output Ports initialization
 // Port B initialization
-// Func7=In Func6=In Func5=In Func4=In Func3=In Func2=In Func1=Out Func0=Out 
-// State7=T State6=T State5=T State4=T State3=T State2=P State1=0 State0=0 
+// Func7=In Func6=In Func5=In Func4=In Func3=In Func2=In Func1=Out Func0=Out
+// State7=T State6=T State5=T State4=T State3=T State2=P State1=0 State0=0
 // Func7=In Func6=In Func5=Out Func4=In Func3=In Func2=In Func1=Out Func0=Out
-// State7=T State6=T State5=0 State4=T State3=T State2=P State1=0 State0=0 
+// State7=T State6=T State5=0 State4=T State3=T State2=P State1=0 State0=0
 PORTB=0x04;
 DDRB=0x23;//DDRB=0x03;
 
 // Port C initialization
-// Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In 
-// State6=P State5=P State4=P State3=P State2=P State1=P State0=T 
+// Func6=In Func5=In Func4=In Func3=In Func2=In Func1=In Func0=In
+// State6=P State5=P State4=P State3=P State2=P State1=P State0=T
 PORTC=0x7E;
 DDRC=0x00;
 
 // Port D initialization
-// Func7=Out Func6=Out Func5=Out Func4=Out Func3=In Func2=In Func1=In Func0=In 
-// State7=0 State6=0 State5=0 State4=0 State3=P State2=P State1=P State0=P 
+// Func7=Out Func6=Out Func5=Out Func4=Out Func3=In Func2=In Func1=In Func0=In
+// State7=0 State6=0 State5=0 State4=0 State3=P State2=P State1=P State0=P
 PORTD=0x0F;
 DDRD=0xF0;
 
@@ -217,7 +279,7 @@ while (1)
 		delay_ms(15); 	// сгенерируем задержку 15 мс
 		#asm("sei")		// разрешим прерывания
 
-      
+
 
       }
 }

@@ -11,5 +11,3 @@ Variable                                                          Register  Size
 --------------------------------------------------------------------------------
 Tcount                                                            R4,R5        2
 adc_data                                                          R7           1
-Fled                                                              R6           1
-Foldled                                                           R9           1
