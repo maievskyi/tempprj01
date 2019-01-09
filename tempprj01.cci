@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 VERSION:3 SOURCE_TIMESTAMP:4E27B244
 NODE:I LEVEL:0 LINE:24 "C:\cvavr2\inc\mega8.h"
 NODE:I LEVEL:0 LINE:26 "C:\cvavr2\inc\delay.h"
@@ -13,3 +14,26 @@ NODE:F LEVEL:0 LINE:63 "read_adc(unsigned char adc_input)"
 NODE:V LEVEL:0 LINE:81 "Fled -> R6"
 NODE:V LEVEL:0 LINE:82 "Foldled -> R9"
 NODE:F LEVEL:0 LINE:84 "main(void)"
+=======
+VERSION:3 SOURCE_TIMESTAMP:4E287C4E
+NODE:I LEVEL:0 LINE:27 "C:\cvavr2\inc\mega8.h"
+NODE:I LEVEL:0 LINE:29 "C:\cvavr2\inc\delay.h"
+NODE:M LEVEL:0 LINE:33 "Tstep"
+NODE:M LEVEL:0 LINE:34 "Testled"
+NODE:M LEVEL:0 LINE:36 "RS"
+NODE:M LEVEL:0 LINE:37 "E"
+NODE:M LEVEL:0 LINE:38 "D4"
+NODE:M LEVEL:0 LINE:39 "D5"
+NODE:M LEVEL:0 LINE:40 "D6"
+NODE:M LEVEL:0 LINE:41 "D7"
+NODE:V LEVEL:0 LINE:42 "Tcount -> R4,R5"
+NODE:F LEVEL:0 LINE:45 "timer0_ovf_isr(void)"
+NODE:V LEVEL:0 LINE:58 "adc_data -> R7"
+NODE:M LEVEL:0 LINE:59 "ADC_VREF_TYPE"
+NODE:F LEVEL:0 LINE:62 "adc_isr(void)"
+NODE:F LEVEL:0 LINE:72 "read_adc(unsigned char adc_input)"
+NODE:F LEVEL:0 LINE:88 "send_LCD(unsigned char RS_value,unsigned char DB4_value,unsigned char DB5_value,unsigned char DB6_value,unsigned char DB7_value)"
+NODE:V LEVEL:0 LINE:94 "Fled -> R6"
+NODE:V LEVEL:0 LINE:95 "Foldled -> R9"
+NODE:F LEVEL:0 LINE:97 "main(void)"
+>>>>>>> 26f834e02d95aff3293ec1887c93d6317de84a52
