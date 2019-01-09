@@ -33,6 +33,10 @@ Data Stack size         : 256
 #define Tstep 1000          //по достжению  (int Tcountint Tcount=Tstep) * врем€ прерыв [TIM0_OVF] = врем€ 1 сек
 #define Testled PORTB.5     // тестовый св-диод на плате arduino
 
+#define mks_after_com 4  //дл€ обработки команд 4 ms ’от€ даташ, требует задержку не менее 40мкс
+#define mks_strobe    5   //задержку дл€ стробирующего импульса, подбираетс€ опытным путем,
+						// 5 мкс было достаточной длительностью дл€ данного LCD.
+
 #define RS  PORTB.0
 #define E   PORTB.1
 #define D4  PORTD.4
@@ -85,11 +89,42 @@ delay_us(10);
 #endasm
 return adc_data;
 }
-void send_LCD(char RS_value,char DB4_value,char DB5_value,char DB6_value,char DB7_value) {
-int t;
+//void send_LCD(char RS_value,char DB4_value,char DB5_value,char DB6_value,char DB7_value) {
+//int t;
+//}
+//xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+void lcd_dat(unsigned char x){     //111111111111>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+RS=1;  // ввод данные
+E=0;  //нет стробимпульса     ???
+PORTD |=0x0F;       //обнул млдш пб-та
+PORTD |=(x & 0xF0); // запись ст пб в порт
+E=1;  //есть стробимпульс
+delay_us(40); 	    //   врем€ 1-строб
+E=0;  //нет стробимпульса (запись)
+delay_us(40); 	    //   задежка после записи
+
+
 }
+void lcd_com(unsigned char x){  //2222222222222222222>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+RS=0;   // ввод команда
+E=0;   //нет стробимпульса
+}
+void lcd_init(void){ //3333333333333333333333333333>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ /*≈сли кратко, то инициализаци€ это последовательность команд
+ оманда є6 Ч 0x30 Ц установить режим 8 бит
+ оманда є6 Ч 0x28 Ц установить режим 4 бита
+ оманда є4 Ч 0x08 Ц выключить дисплей
+ оманда є1 Ч 0x01Ц  сброс диспле€
+ оманда є3 Ч 0x06Ц  при записи, курсор сдвигать вправо
+ оманда є4 Ч 0x0C Ц включить дисплей
+*/
+delay_ms(20); 	// сгенерируем задержку 20 мс 
+ // ----- команда є6 (установка разр€дности) посылаем 0x30 на D4-D7 ----- 
+ // send_LCD(0,1,1,0,0);              // RS=0, DB4=1, DB5=1, DB6=0, DB7=0
 
 
+}
+//...............................................................................
 // Declare your global variables here
 char Fled = 0; // флаг дл€ свтда
 char Foldled = 0; // флаг дл€ свтда
